@@ -59,11 +59,5 @@ public class EmployeeController {
     }
 
 
-    @PostMapping("/editEmployee")
-    public String editEmployee(@ModelAttribute("employee") Employee employee) {
-        //save employee to database
-        employeeService.saveEmployee(employee);
-        return "redirect:/";
-    }
 
 }
