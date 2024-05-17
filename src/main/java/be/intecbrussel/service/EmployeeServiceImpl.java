@@ -23,14 +23,36 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeRepository.findAll();
     }
 
+    // This ensure n
     @Override
     public void saveEmployee(Employee employee) {
-        Optional<Employee> optionalEmployee = employeeRepository.findEmployeeByEmail(employee.getEmail());
-        if (optionalEmployee.isPresent()) {
-            throw new IllegalStateException("email taken");
+        if (employee.getId() != null) {
+            // Editing an existing employee
+            Optional<Employee> existingEmployeeOptional = employeeRepository.findById(employee.getId());
+            if (existingEmployeeOptional.isPresent()) {
+                Employee existingEmployee = existingEmployeeOptional.get();
+                if (!existingEmployee.getEmail().equals(employee.getEmail())) {
+                    // Check if the new email is taken by another employee
+                    Optional<Employee> emailCheckEmployee = employeeRepository.findEmployeeByEmail(employee.getEmail());
+                    if (emailCheckEmployee.isPresent()) {
+                        throw new IllegalStateException("email taken");
+                    }
+                }
+                // Save the updated employee details
+                employeeRepository.save(employee);
+            } else {
+                throw new IllegalStateException("employee not found");
+            }
+        } else {
+            // Creating a new employee
+            Optional<Employee> optionalEmployee = employeeRepository.findEmployeeByEmail(employee.getEmail());
+            if (optionalEmployee.isPresent()) {
+                throw new IllegalStateException("email taken");
+            }
+            employeeRepository.save(employee);
         }
-         employeeRepository.save(employee);
     }
+
 
     @Override
     public Employee getEmployeeById(Long id) {
